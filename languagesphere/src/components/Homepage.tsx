@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -123,6 +124,7 @@ const OptionCard = styled(Card)({
 });
 
 const Homepage: React.FC = () => {
+  const navigate = useNavigate();
   const [paymentStatus, setPaymentStatus] = useState<{ course: boolean; book: boolean }>({
     course: false,
     book: false,
@@ -406,6 +408,218 @@ const Homepage: React.FC = () => {
                 </ServiceCard>
               </Grid>
             ))}
+          </Grid>
+        </Container>
+      </Section>
+
+      {/* Course/Book Purchase Section */}
+      <Section id="course-book" className="alt">
+        <Container maxWidth="lg">
+          <Typography
+            variant="h2"
+            sx={{
+              fontFamily: "'Poppins', sans-serif",
+              fontWeight: 600,
+              color: '#2c3e50',
+              marginBottom: 2,
+              textAlign: 'center',
+            }}
+          >
+            Enroll in Course or Purchase Book
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              fontFamily: "'Poppins', sans-serif",
+              fontSize: '1.1rem',
+              marginBottom: 4,
+              textAlign: 'center',
+              color: '#555',
+            }}
+          >
+            Choose to enroll in our comprehensive language course or purchase our study guide PDF
+          </Typography>
+          <Grid container spacing={4} sx={{ marginBottom: 4 }}>
+            <Grid item xs={12} md={6}>
+              <OptionCard
+                sx={{
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: '#fff',
+                }}
+              >
+                <CardContent sx={{ padding: 4, textAlign: 'center', minHeight: '350px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <Box>
+                    <SchoolIcon sx={{ fontSize: 60, marginBottom: 2 }} />
+                    <Typography
+                      variant="h4"
+                      sx={{
+                        fontFamily: "'Poppins', sans-serif",
+                        fontWeight: 600,
+                        marginBottom: 2,
+                      }}
+                    >
+                      Enroll in Course
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontFamily: "'Poppins', sans-serif",
+                        lineHeight: 1.8,
+                        marginBottom: 3,
+                      }}
+                    >
+                      Join our comprehensive language training program with live sessions, recorded classes, and personalized mentorship.
+                    </Typography>
+                  </Box>
+                  {paymentStatus.course ? (
+                    <Alert severity="success" sx={{ marginTop: 2 }}>
+                      ✓ Payment Confirmed - Course Access Granted
+                    </Alert>
+                  ) : (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <Button
+                        variant="contained"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate('/course-details');
+                        }}
+                        sx={{
+                          backgroundColor: '#fff',
+                          color: '#667eea',
+                          padding: '12px 30px',
+                          fontSize: '18px',
+                          borderRadius: '8px',
+                          textTransform: 'none',
+                          fontFamily: "'Poppins', sans-serif",
+                          fontWeight: 600,
+                          width: '100%',
+                          '&:hover': {
+                            backgroundColor: '#f5f5f5',
+                          },
+                        }}
+                      >
+                        View Course Details
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePaymentClick('course');
+                        }}
+                        sx={{
+                          borderColor: '#fff',
+                          color: '#fff',
+                          padding: '12px 30px',
+                          fontSize: '18px',
+                          borderRadius: '8px',
+                          textTransform: 'none',
+                          fontFamily: "'Poppins', sans-serif",
+                          fontWeight: 600,
+                          width: '100%',
+                          '&:hover': {
+                            borderColor: '#fff',
+                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                          },
+                        }}
+                      >
+                        Enroll Now
+                      </Button>
+                    </Box>
+                  )}
+                </CardContent>
+              </OptionCard>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <OptionCard
+                onClick={() => !paymentStatus.book && handlePaymentClick('book')}
+                sx={{
+                  background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                  color: '#fff',
+                  opacity: paymentStatus.book ? 0.9 : 1,
+                }}
+              >
+                <CardContent sx={{ padding: 4, textAlign: 'center', minHeight: '350px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <Box>
+                    <BookIcon sx={{ fontSize: 60, marginBottom: 2 }} />
+                    <Typography
+                      variant="h4"
+                      sx={{
+                        fontFamily: "'Poppins', sans-serif",
+                        fontWeight: 600,
+                        marginBottom: 2,
+                      }}
+                    >
+                      Purchase Book PDF
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontFamily: "'Poppins', sans-serif",
+                        lineHeight: 1.8,
+                        marginBottom: 3,
+                      }}
+                    >
+                      Get instant access to our comprehensive study guide PDF. Perfect for self-study and exam preparation.
+                    </Typography>
+                  </Box>
+                  {paymentStatus.book ? (
+                    <Box>
+                      <Alert severity="success" sx={{ marginTop: 2, marginBottom: 2 }}>
+                        ✓ Payment Confirmed
+                      </Alert>
+                      <Button
+                        variant="contained"
+                        startIcon={<DownloadIcon />}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDownloadPDF();
+                        }}
+                        sx={{
+                          backgroundColor: '#fff',
+                          color: '#f5576c',
+                          padding: '12px 30px',
+                          fontSize: '18px',
+                          borderRadius: '8px',
+                          textTransform: 'none',
+                          fontFamily: "'Poppins', sans-serif",
+                          fontWeight: 600,
+                          width: '100%',
+                          '&:hover': {
+                            backgroundColor: '#f5f5f5',
+                          },
+                        }}
+                      >
+                        Download PDF
+                      </Button>
+                    </Box>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePaymentClick('book');
+                      }}
+                      sx={{
+                        backgroundColor: '#fff',
+                        color: '#f5576c',
+                        padding: '12px 30px',
+                        fontSize: '18px',
+                        borderRadius: '8px',
+                        textTransform: 'none',
+                        fontFamily: "'Poppins', sans-serif",
+                        fontWeight: 600,
+                        width: '100%',
+                        '&:hover': {
+                          backgroundColor: '#f5f5f5',
+                        },
+                      }}
+                    >
+                      Purchase PDF
+                    </Button>
+                  )}
+                </CardContent>
+              </OptionCard>
+            </Grid>
           </Grid>
         </Container>
       </Section>
