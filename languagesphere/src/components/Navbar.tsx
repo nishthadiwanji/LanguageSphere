@@ -22,10 +22,13 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { useAuth } from '../context/AuthContext';
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [servicesAnchorEl, setServicesAnchorEl] = useState<null | HTMLElement>(null);
   const [servicesOpenMobile, setServicesOpenMobile] = useState(false);
@@ -122,7 +125,18 @@ const Navbar: React.FC = () => {
     { label: 'Reviews', href: '#reviews' },
     { label: 'Payments', href: '#payment' },
     { label: 'Contact', href: '#contact' },
+    ...(!user ? [
+      { label: 'Login', href: '/login' },
+      { label: 'Sign Up', href: '/signup' },
+    ] : []),
   ];
+
+  const handleLogout = () => {
+    logout();
+    if (location.pathname !== '/') {
+      navigate('/');
+    }
+  };
 
   const drawer = (
     <Box sx={{ textAlign: 'center' }}>
@@ -200,6 +214,20 @@ const Navbar: React.FC = () => {
             )}
           </React.Fragment>
         ))}
+        {user && (
+          <ListItem disablePadding>
+            <ListItemButton
+              sx={{ textAlign: 'center' }}
+              component="button"
+              onClick={() => {
+                handleLogout();
+                handleDrawerToggle();
+              }}
+            >
+              <ListItemText primary="Logout" />
+            </ListItemButton>
+          </ListItem>
+        )}
       </List>
     </Box>
   );
@@ -368,10 +396,18 @@ const Navbar: React.FC = () => {
                         }
                       }
                     }}
+                    variant={item.label === 'Sign Up' ? 'outlined' : 'text'}
                     sx={{
                       fontFamily: "'Poppins', sans-serif",
                       textTransform: 'none',
                       fontSize: '1rem',
+                      ...(item.label === 'Sign Up' && {
+                        borderColor: 'rgba(255, 255, 255, 0.5)',
+                        '&:hover': {
+                          borderColor: '#fff',
+                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        },
+                      }),
                       '&:hover': {
                         backgroundColor: 'rgba(255, 255, 255, 0.1)',
                       },
@@ -381,6 +417,34 @@ const Navbar: React.FC = () => {
                   </Button>
                 )
               ))}
+              {user && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, marginLeft: 1 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontFamily: "'Poppins', sans-serif",
+                      fontSize: '0.9rem',
+                    }}
+                  >
+                    {user.name}
+                  </Typography>
+                  <Button
+                    color="inherit"
+                    startIcon={<LogoutIcon />}
+                    onClick={handleLogout}
+                    sx={{
+                      fontFamily: "'Poppins', sans-serif",
+                      textTransform: 'none',
+                      fontSize: '0.9rem',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      },
+                    }}
+                  >
+                    Logout
+                  </Button>
+                </Box>
+              )}
             </Box>
           )}
         </Toolbar>

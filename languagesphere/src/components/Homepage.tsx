@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import {
   Box,
   Container,
@@ -125,6 +126,7 @@ const OptionCard = styled(Card)({
 
 const Homepage: React.FC = () => {
   const navigate = useNavigate();
+  const { user, checkPaymentStatus } = useAuth();
   const [paymentStatus, setPaymentStatus] = useState<{ course: boolean; book: boolean }>({
     course: false,
     book: false,
@@ -132,8 +134,6 @@ const Homepage: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedOption, setSelectedOption] = useState<'course' | 'book' | null>(null);
   const [tabValue, setTabValue] = useState(0);
-  // TODO: Replace with your actual PDF URL after uploading the file
-  const [pdfUrl] = useState<string>('/path/to/your/book.pdf');
 
   const handlePaymentComplete = (option: 'course' | 'book') => {
     // In production, this should be called via webhook after payment verification
@@ -143,18 +143,20 @@ const Homepage: React.FC = () => {
     setPaymentStatus((prev) => ({ ...prev, [option]: true }));
     setOpenDialog(false);
     if (option === 'book') {
-      // Trigger PDF download after a short delay
-      setTimeout(() => {
-        handleDownloadPDF();
-      }, 500);
+      // Navigate to book viewer instead of downloading
+      navigate('/book-viewer');
     }
   };
 
   useEffect(() => {
-    // Check payment status from localStorage on component mount
-    const coursePaid = localStorage.getItem('course_payment') === 'true';
-    const bookPaid = localStorage.getItem('book_payment') === 'true';
-    setPaymentStatus({ course: coursePaid, book: bookPaid });
+    // Check payment status from user data
+    if (user) {
+      setPaymentStatus({
+        course: user.payments?.course?.paid || false,
+        book: user.payments?.book?.paid || false,
+      });
+      checkPaymentStatus();
+    }
 
     // Check for payment success in URL parameters (for Razorpay/PayPal redirects)
     const urlParams = new URLSearchParams(window.location.search);
@@ -162,40 +164,60 @@ const Homepage: React.FC = () => {
     const paymentOption = urlParams.get('option') as 'course' | 'book' | null;
     const paymentId = urlParams.get('payment_id');
 
-    if (paymentStatusParam === 'success' && paymentOption && paymentId) {
-      // In production, verify paymentId with your backend API
-      // For now, we'll mark as paid if payment_status is success
-      handlePaymentComplete(paymentOption);
+    if (paymentStatusParam === 'success' && paymentOption && paymentId && user) {
+      // Verify payment with backend
+      verifyPaymentWithBackend(paymentOption, paymentId);
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
+
+  const verifyPaymentWithBackend = async (option: 'course' | 'book', paymentId: string) => {
+    if (!user) return;
+    
+    try {
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(`${API_URL}/payment/verify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ paymentId, option }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPaymentStatus({
+          course: data.payments?.course?.paid || false,
+          book: data.payments?.book?.paid || false,
+        });
+        checkPaymentStatus();
+        setOpenDialog(false);
+        
+        if (option === 'book') {
+          // Navigate to book viewer instead of downloading
+          navigate('/book-viewer');
+        }
+      }
+    } catch (error) {
+      console.error('Payment verification error:', error);
+    }
+  };
 
   const handlePaymentClick = (option: 'course' | 'book') => {
+    if (!user) {
+      // Redirect to login if not authenticated
+      navigate('/login');
+      return;
+    }
     setSelectedOption(option);
     setOpenDialog(true);
   };
 
-  // Function to manually verify payment (for testing or manual verification)
-  const verifyPayment = (option: 'course' | 'book', paymentId: string) => {
-    // In production, verify paymentId with your payment gateway API
-    // For now, we'll mark as paid if paymentId is provided
-    if (paymentId) {
-      handlePaymentComplete(option);
-    }
-  };
-
-  const handleDownloadPDF = () => {
-    if (paymentStatus.book && pdfUrl) {
-      const link = document.createElement('a');
-      link.href = pdfUrl;
-      link.download = 'LanguageSphere-Study-Guide.pdf';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  };
 
   const services = [
     {
@@ -569,10 +591,9 @@ const Homepage: React.FC = () => {
                       </Alert>
                       <Button
                         variant="contained"
-                        startIcon={<DownloadIcon />}
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleDownloadPDF();
+                          navigate('/book-viewer');
                         }}
                         sx={{
                           backgroundColor: '#fff',
@@ -589,7 +610,7 @@ const Homepage: React.FC = () => {
                           },
                         }}
                       >
-                        Download PDF
+                        View PDF
                       </Button>
                     </Box>
                   ) : (
