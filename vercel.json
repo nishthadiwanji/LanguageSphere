@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "buildCommand": "cd languagesphere && npm install && npm run build",
+  "outputDirectory": "languagesphere/build",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+
