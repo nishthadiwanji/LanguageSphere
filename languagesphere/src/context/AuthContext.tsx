@@ -165,9 +165,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       if (response.ok) {
         const data = await response.json();
-        if (user) {
-          setUser({ ...user, payments: data.payments });
-        }
+        // Update user state with latest payment status
+        setUser((prevUser) => {
+          if (prevUser) {
+            return { ...prevUser, payments: data.payments };
+          }
+          return prevUser;
+        });
       }
     } catch (error) {
       console.error('Error checking payment status:', error);

@@ -1,13 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const path = require('path');
+const fs = require('fs');
 const User = require('../models/User');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
-// Middleware to verify token
+// Middleware to verify token (supports both header and query parameter for PDF viewing)
 const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
+  // Check Authorization header first, then query parameter
+  let token = req.headers.authorization?.split(' ')[1];
+  
+  // For PDF viewing in iframes, also check query parameter
+  if (!token && req.query.token) {
+    token = req.query.token;
+  }
   
   if (!token) {
     return res.status(401).json({ message: 'No token provided' });
@@ -74,6 +82,71 @@ router.get('/status', verifyToken, async (req, res) => {
   }
 });
 
+// Serve PDF file directly (protected route)
+router.get('/pdf', verifyToken, async (req, res) => {
+  let fileStream = null;
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // TEST MODE: Allow access without payment (DEVELOPMENT ONLY - REMOVE IN PRODUCTION)
+    const isTestMode = process.env.TEST_MODE === 'true' && process.env.NODE_ENV !== 'production';
+    
+    // Check if user has paid for the book (unless in test mode)
+    if (!isTestMode && !user.payments?.book?.paid) {
+      return res.status(403).json({ message: 'Payment required to access PDF' });
+    }
+
+    // Path to PDF file in uploads folder
+    const pdfPath = path.join(__dirname, '../uploads/LanguageSphereBook.pdf');
+    
+    // Check if file exists
+    if (!fs.existsSync(pdfPath)) {
+      console.error(`PDF file not found at path: ${pdfPath}`);
+      return res.status(404).json({ message: 'PDF file not found on server' });
+    }
+
+    // Set headers for PDF viewing (inline means view in browser, not download)
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline; filename="LanguageSphereBook.pdf"');
+    res.setHeader('Cache-Control', 'private, max-age=3600'); // Cache for 1 hour
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    
+    // Allow iframe embedding - don't set X-Frame-Options to allow embedding
+    // CORS is handled by the cors() middleware in server.js
+    
+    // Stream the PDF file with proper error handling
+    fileStream = fs.createReadStream(pdfPath);
+    
+    // Handle stream errors
+    fileStream.on('error', (error) => {
+      console.error('PDF stream error:', error);
+      if (!res.headersSent) {
+        res.status(500).json({ message: 'Error reading PDF file' });
+      }
+    });
+
+    // Handle client disconnect
+    req.on('close', () => {
+      if (fileStream) {
+        fileStream.destroy();
+      }
+    });
+
+    fileStream.pipe(res);
+  } catch (error) {
+    console.error('PDF serving error:', error);
+    if (fileStream) {
+      fileStream.destroy();
+    }
+    if (!res.headersSent) {
+      res.status(500).json({ message: 'Server error while serving PDF' });
+    }
+  }
+});
+
 // Get secure PDF URL (only if payment is verified)
 router.get('/pdf-url', verifyToken, async (req, res) => {
   try {
@@ -82,8 +155,8 @@ router.get('/pdf-url', verifyToken, async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // TEST MODE: Allow access without payment (DEVELOPMENT ONLY)
-    const isTestMode = process.env.TEST_MODE === 'true';
+    // TEST MODE: Allow access without payment (DEVELOPMENT ONLY - REMOVE IN PRODUCTION)
+    const isTestMode = process.env.TEST_MODE === 'true' && process.env.NODE_ENV !== 'production';
     
     // Check if user has paid for the book (unless in test mode)
     if (!isTestMode && !user.payments?.book?.paid) {
@@ -93,77 +166,31 @@ router.get('/pdf-url', verifyToken, async (req, res) => {
       });
     }
 
-    // Get PDF URL from environment variable (stored securely on server)
-    const pdfUrl = process.env.PDF_URL || process.env.REACT_APP_PDF_URL;
+    // Get PDF URL from environment variable, or use the server route
+    const envPdfUrl = process.env.PDF_URL || process.env.REACT_APP_PDF_URL;
     
-    if (!pdfUrl) {
-      return res.status(500).json({ 
-        message: 'PDF URL not configured on server' 
-      });
+    // Validate that the environment URL is a proper HTTP/HTTPS URL (not a file path)
+    const isValidUrl = envPdfUrl && (envPdfUrl.startsWith('http://') || envPdfUrl.startsWith('https://'));
+    
+    // If no valid external URL is configured, use the server route
+    // Construct the full URL based on the request
+    let baseUrl = isValidUrl ? envPdfUrl : `${req.protocol}://${req.get('host')}/api/payment/pdf`;
+    
+    // If using server route, append token as query parameter for iframe authentication
+    if (!isValidUrl) {
+      const token = req.headers.authorization?.split(' ')[1] || req.query.token;
+      if (token) {
+        baseUrl += `?token=${token}`;
+      }
     }
-
-    // Option 1: Return direct URL (if using signed URLs or private storage)
-    // Option 2: Generate signed URL for cloud storage (AWS S3, GCS, etc.)
-    // Option 3: Return server endpoint that proxies the PDF
     
-    // For now, return the URL (in production, use signed URLs for security)
     res.json({
-      pdfUrl: pdfUrl,
+      pdfUrl: baseUrl,
       expiresIn: 3600, // URL valid for 1 hour (if using signed URLs)
     });
   } catch (error) {
     console.error('PDF URL error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Serve PDF file directly (protected route)
-router.get('/pdf', verifyToken, async (req, res) => {
-  try {
-    const user = await User.findById(req.userId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    // TEST MODE: Allow access without payment (DEVELOPMENT ONLY)
-    const isTestMode = process.env.TEST_MODE === 'true';
-    
-    // Check if user has paid for the book (unless in test mode)
-    if (!isTestMode && !user.payments?.book?.paid) {
-      return res.status(403).json({ message: 'Payment required to access PDF' });
-    }
-
-    const path = require('path');
-    const fs = require('fs');
-    
-    // Path to PDF file (adjust based on your setup)
-    const pdfPath = process.env.PDF_PATH || path.join(__dirname, '../uploads/LanguageSphereBook.pdf');
-    
-    // Check if file exists
-    if (!fs.existsSync(pdfPath)) {
-      return res.status(404).json({ message: 'PDF file not found on server' });
-    }
-
-    // Set headers for PDF viewing
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'inline; filename="LanguageSphereBook.pdf"');
-    
-    // Add cache control headers
-    res.setHeader('Cache-Control', 'private, max-age=3600');
-    
-    // Stream the PDF
-    const fileStream = fs.createReadStream(pdfPath);
-    fileStream.pipe(res);
-    
-    fileStream.on('error', (error) => {
-      console.error('Error streaming PDF:', error);
-      if (!res.headersSent) {
-        res.status(500).json({ message: 'Error serving PDF' });
-      }
-    });
-  } catch (error) {
-    console.error('PDF serving error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error while generating PDF URL' });
   }
 });
 

@@ -195,16 +195,22 @@ const Homepage: React.FC = () => {
           course: data.payments?.course?.paid || false,
           book: data.payments?.book?.paid || false,
         });
-        checkPaymentStatus();
+        // Refresh payment status from backend to update user context
+        await checkPaymentStatus();
         setOpenDialog(false);
         
         if (option === 'book') {
           // Navigate to book viewer instead of downloading
           navigate('/book-viewer');
         }
+      } else {
+        const errorData = await response.json();
+        console.error('Payment verification failed:', errorData);
+        alert(`Payment verification failed: ${errorData.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Payment verification error:', error);
+      alert('Failed to verify payment. Please try again.');
     }
   };
 
@@ -276,7 +282,7 @@ const Homepage: React.FC = () => {
         <iframe
           width="100%"
           height="100%"
-          src="https://www.youtube.com/embed/FvjhZEeIJcY?si=wuqe3d1rCZE4trNj&autoplay=1&mute=1"
+          src="https://www.youtube.com/embed/An2Ar7aYAkc?autoplay=1&mute=1"
           title="YouTube video player"
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -901,6 +907,41 @@ const Homepage: React.FC = () => {
                 </PayButton>
               </a>
             )}
+          </Box>
+          {/* Test Payment Button for Development */}
+          <Box sx={{ textAlign: 'center', marginTop: 2, paddingTop: 2, borderTop: '1px solid #e0e0e0' }}>
+            <Button
+              onClick={() => {
+                if (selectedOption) {
+                  verifyPaymentWithBackend(selectedOption, `test_payment_${Date.now()}`);
+                }
+              }}
+              variant="outlined"
+              sx={{
+                fontFamily: "'Poppins', sans-serif",
+                textTransform: 'none',
+                borderColor: '#4caf50',
+                color: '#4caf50',
+                '&:hover': {
+                  borderColor: '#45a049',
+                  backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                },
+              }}
+            >
+              🧪 Test Payment (Development Only)
+            </Button>
+            <Typography
+              variant="caption"
+              sx={{
+                display: 'block',
+                marginTop: 1,
+                fontFamily: "'Poppins', sans-serif",
+                color: '#999',
+                fontStyle: 'italic',
+              }}
+            >
+              Click to simulate payment for testing
+            </Typography>
           </Box>
           <Alert severity="info" sx={{ marginTop: 3 }}>
             <Typography variant="body2" sx={{ fontFamily: "'Poppins', sans-serif" }}>
