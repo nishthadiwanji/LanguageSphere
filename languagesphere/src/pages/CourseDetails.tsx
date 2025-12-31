@@ -24,7 +24,6 @@ import { styled } from '@mui/material/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ScheduleIcon from '@mui/icons-material/Schedule';
-import PeopleIcon from '@mui/icons-material/People';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import SchoolIcon from '@mui/icons-material/School';
 import Navbar from '../components/Navbar';
