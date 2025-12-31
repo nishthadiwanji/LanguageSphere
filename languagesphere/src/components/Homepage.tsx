@@ -910,7 +910,7 @@ const Homepage: React.FC = () => {
           </Box>
           {/* Test Payment Button for Development */}
           <Box sx={{ textAlign: 'center', marginTop: 2, paddingTop: 2, borderTop: '1px solid #e0e0e0' }}>
-            <Button
+            {/* <Button
               onClick={() => {
                 if (selectedOption) {
                   verifyPaymentWithBackend(selectedOption, `test_payment_${Date.now()}`);
@@ -928,8 +928,7 @@ const Homepage: React.FC = () => {
                 },
               }}
             >
-              {/* 🧪 Test Payment (Development Only) */}
-            </Button>
+            </Button> */}
             <Typography
               variant="caption"
               sx={{
