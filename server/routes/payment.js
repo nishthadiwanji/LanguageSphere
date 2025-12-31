@@ -99,8 +99,24 @@ router.get('/pdf', verifyToken, async (req, res) => {
       return res.status(403).json({ message: 'Payment required to access PDF' });
     }
 
-    // Path to PDF file in uploads folder
-    const pdfPath = path.join(__dirname, '../uploads/LanguageSphereBook.pdf');
+    // Path to PDF file - try multiple locations for different environments
+    // For Vercel: PDF is in api/ directory (bundled with serverless function)
+    // For local: PDF is in server/uploads/ directory
+    // __dirname will be server/routes/ in the deployment
+    
+    // Try api/ directory first (for Vercel deployment)
+    // From server/routes/ go up to root, then to api/
+    let pdfPath = path.join(__dirname, '../../api/LanguageSphereBook.pdf');
+    
+    // If not found, try local uploads directory (for development)
+    if (!fs.existsSync(pdfPath)) {
+      pdfPath = path.join(__dirname, '../uploads/LanguageSphereBook.pdf');
+    }
+    
+    // If still not found, try root directory as last resort
+    if (!fs.existsSync(pdfPath)) {
+      pdfPath = path.join(__dirname, '../../LanguageSphereBook.pdf');
+    }
     
     // Check if file exists
     if (!fs.existsSync(pdfPath)) {
