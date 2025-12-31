@@ -8,9 +8,16 @@ import {
   Alert,
   Paper,
   CircularProgress,
+  Dialog,
+  IconButton,
+  AppBar,
+  Toolbar,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
+import CloseIcon from '@mui/icons-material/Close';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -28,11 +35,17 @@ const PDFViewer = styled(Box)({
   borderRadius: '8px',
   overflow: 'hidden',
   boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+  position: 'relative',
+  '& object': {
+    width: '100%',
+    height: '100%',
+    border: 'none',
+    display: 'block',
+  },
   '& iframe': {
     width: '100%',
     height: '100%',
     border: 'none',
-    pointerEvents: 'auto',
   },
   '& embed': {
     width: '100%',
@@ -47,8 +60,10 @@ const BookViewerContent: React.FC = () => {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [useEmbed, setUseEmbed] = useState(false);
+  const [fullscreenOpen, setFullscreenOpen] = useState(false);
+  const [useIframe, setUseIframe] = useState(false);
   const hasFetchedRef = useRef(false);
+  const fullscreenContainerRef = useRef<HTMLDivElement>(null);
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
   // Create a stable value for payment status to use in dependencies
@@ -67,6 +82,54 @@ const BookViewerContent: React.FC = () => {
     checkPaymentStatus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Prevent right-click and keyboard shortcuts in fullscreen mode
+  useEffect(() => {
+    if (!fullscreenOpen) return;
+
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+      return false;
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent Ctrl+S / Cmd+S (save)
+      if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+      // Prevent Ctrl+P / Cmd+P (print) - optional, you might want to allow this
+      // if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) {
+      //   e.preventDefault();
+      //   e.stopPropagation();
+      //   return false;
+      // }
+      // Prevent F12 (developer tools)
+      if (e.key === 'F12') {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    };
+
+    const handleSelectStart = (e: Event) => {
+      e.preventDefault();
+      return false;
+    };
+
+    // Add event listeners
+    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('selectstart', handleSelectStart);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('selectstart', handleSelectStart);
+    };
+  }, [fullscreenOpen]);
 
   // Fetch PDF URL only once when token and payment status are valid
   useEffect(() => {
@@ -299,19 +362,8 @@ const BookViewerContent: React.FC = () => {
           ) : pdfUrl ? (
             <>
               <PDFViewer>
-                {useEmbed ? (
-                  // Fallback to embed tag if iframe fails
-                  <embed
-                    src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=1`}
-                    type="application/pdf"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      border: 'none',
-                    }}
-                  />
-                ) : (
-                  // Try iframe first
+                {useIframe ? (
+                  // Fallback to iframe if object fails
                   <iframe
                     src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=1`}
                     title="Study Guide PDF"
@@ -320,17 +372,47 @@ const BookViewerContent: React.FC = () => {
                       height: '100%',
                       border: 'none',
                     }}
-                    onLoad={(e) => {
-                      // PDF loaded successfully
+                    onLoad={() => {
                       console.log('PDF iframe loaded successfully');
                       setError(null);
                     }}
-                    onError={(e) => {
-                      console.error('PDF iframe loading error, trying embed fallback:', e);
-                      setUseEmbed(true);
+                    onError={() => {
+                      console.error('PDF iframe loading error');
+                      setError('Failed to load PDF. Please try refreshing the page.');
                     }}
-                    allow="fullscreen"
                   />
+                ) : (
+                  // Use object tag (more reliable for PDFs)
+                  <object
+                    data={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=1`}
+                    type="application/pdf"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      border: 'none',
+                    }}
+                    onError={() => {
+                      console.warn('PDF object failed, trying iframe fallback');
+                      setUseIframe(true);
+                    }}
+                  >
+                    <Alert severity="warning" sx={{ p: 2 }}>
+                      <Typography variant="body2" sx={{ fontFamily: "'Poppins', sans-serif", mb: 1 }}>
+                        Your browser does not support PDF viewing. Please use a modern browser like Chrome, Firefox, or Edge.
+                      </Typography>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => setUseIframe(true)}
+                        sx={{
+                          fontFamily: "'Poppins', sans-serif",
+                          textTransform: 'none',
+                        }}
+                      >
+                        Try Alternative View
+                      </Button>
+                    </Alert>
+                  </object>
                 )}
               </PDFViewer>
               <Box sx={{ marginTop: 2, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -341,20 +423,72 @@ const BookViewerContent: React.FC = () => {
                 </Alert>
                 <Button
                   variant="outlined"
-                  size="small"
-                  onClick={() => {
-                    if (pdfUrl) {
-                      window.open(pdfUrl, '_blank');
-                    }
-                  }}
+                  startIcon={<FullscreenIcon />}
+                  onClick={() => setFullscreenOpen(true)}
                   sx={{
                     fontFamily: "'Poppins', sans-serif",
                     textTransform: 'none',
                   }}
                 >
-                  Open in New Tab
+                  Fullscreen View
                 </Button>
               </Box>
+              {/* Fullscreen PDF Viewer Dialog */}
+              <Dialog
+                fullScreen
+                open={fullscreenOpen}
+                onClose={() => setFullscreenOpen(false)}
+                sx={{
+                  '& .MuiDialog-paper': {
+                    backgroundColor: '#2c3e50',
+                  },
+                }}
+              >
+                <AppBar sx={{ position: 'relative', backgroundColor: '#2c3e50' }}>
+                  <Toolbar>
+                    <Typography sx={{ flex: 1, fontFamily: "'Poppins', sans-serif", fontSize: '1.2rem' }}>
+                      Study Guide PDF (View Only)
+                    </Typography>
+                    <IconButton
+                      edge="end"
+                      color="inherit"
+                      onClick={() => setFullscreenOpen(false)}
+                      aria-label="close"
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                  </Toolbar>
+                </AppBar>
+                <Box
+                  ref={fullscreenContainerRef}
+                  sx={{
+                    width: '100%',
+                    height: 'calc(100vh - 64px)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    backgroundColor: '#525252',
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                  }}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    return false;
+                  }}
+                  onDragStart={(e) => e.preventDefault()}
+                >
+                  <iframe
+                    src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&zoom=page-width`}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      border: 'none',
+                      display: 'block',
+                    }}
+                    title="Study Guide PDF Fullscreen"
+                    allow="fullscreen"
+                  />
+                </Box>
+              </Dialog>
               {/* Debug info in development */}
               {process.env.NODE_ENV === 'development' && (
                 <Alert severity="info" sx={{ marginTop: 2 }}>

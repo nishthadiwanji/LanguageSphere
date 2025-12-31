@@ -34,7 +34,7 @@ const Navbar: React.FC = () => {
   const [servicesOpenMobile, setServicesOpenMobile] = useState(false);
   const [menuTimeout, setMenuTimeout] = useState<NodeJS.Timeout | null>(null);
   const [isHoveringMenu, setIsHoveringMenu] = useState(false);
-  const buttonRef = useRef<HTMLAnchorElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -236,18 +236,53 @@ const Navbar: React.FC = () => {
     <>
       <AppBar position="sticky" sx={{ backgroundColor: '#2c3e50', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
         <Toolbar sx={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-          <Typography
-            variant="h6"
-            component="div"
+          <Box
+            component="button"
+            onClick={() => navigate('/')}
             sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
               flexGrow: 1,
-              fontFamily: "'Poppins', sans-serif",
-              fontWeight: 600,
-              fontSize: '1.5rem',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 0,
+              '&:hover': {
+                opacity: 0.9,
+              },
             }}
           >
-            Language Sphere
-          </Typography>
+            <Box
+              component="img"
+              src={`${process.env.PUBLIC_URL}/logo.jpg`}
+              alt="Language Sphere Logo"
+              sx={{
+                height: { xs: '35px', sm: '45px', md: '50px' },
+                width: 'auto',
+                objectFit: 'contain',
+                display: 'block',
+                maxWidth: { xs: '120px', sm: '150px', md: '180px' },
+              }}
+              onError={(e) => {
+                // Fallback: if logo doesn't exist, hide the image
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{
+                fontFamily: "'Poppins', sans-serif",
+                fontWeight: 600,
+                fontSize: { xs: '1.1rem', sm: '1.4rem', md: '1.6rem' },
+                color: '#ffffff',
+                display: { xs: 'none', sm: 'block' },
+              }}
+            >
+              Language Sphere
+            </Typography>
+          </Box>
           {isMobile ? (
             <IconButton
               color="inherit"
@@ -258,7 +293,7 @@ const Navbar: React.FC = () => {
               <MenuIcon />
             </IconButton>
           ) : (
-            <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               {navItems.map((item) => (
                 item.hasDropdown ? (
                   <Box 
@@ -267,19 +302,24 @@ const Navbar: React.FC = () => {
                     onMouseLeave={handleServicesMouseLeave}
                     sx={{ 
                       position: 'relative', 
-                      display: 'inline-block',
+                      display: 'flex',
+                      alignItems: 'center',
                     }}
                   >
                     <Button
                       ref={buttonRef}
                       color="inherit"
-                      component="a"
-                      href={item.href}
+                      component="button"
                       onClick={handleServicesClick}
                       sx={{
                         fontFamily: "'Poppins', sans-serif",
                         textTransform: 'none',
                         fontSize: '1rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minWidth: 'auto',
+                        padding: '6px 16px',
                         '&:hover': {
                           backgroundColor: 'rgba(255, 255, 255, 0.1)',
                         },
@@ -401,6 +441,11 @@ const Navbar: React.FC = () => {
                       fontFamily: "'Poppins', sans-serif",
                       textTransform: 'none',
                       fontSize: '1rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minWidth: 'auto',
+                      padding: '6px 16px',
                       ...(item.label === 'Sign Up' && {
                         borderColor: 'rgba(255, 255, 255, 0.5)',
                         '&:hover': {

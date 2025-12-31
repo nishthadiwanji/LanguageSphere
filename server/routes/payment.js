@@ -114,7 +114,7 @@ router.get('/pdf', verifyToken, async (req, res) => {
     res.setHeader('Cache-Control', 'private, max-age=3600'); // Cache for 1 hour
     res.setHeader('X-Content-Type-Options', 'nosniff');
     
-    // Allow iframe embedding - don't set X-Frame-Options to allow embedding
+    // Allow iframe/object embedding - don't set X-Frame-Options to allow embedding
     // CORS is handled by the cors() middleware in server.js
     
     // Stream the PDF file with proper error handling
