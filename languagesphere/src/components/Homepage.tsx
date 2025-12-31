@@ -928,7 +928,7 @@ const Homepage: React.FC = () => {
                 },
               }}
             >
-              🧪 Test Payment (Development Only)
+              {/* 🧪 Test Payment (Development Only) */}
             </Button>
             <Typography
               variant="caption"
