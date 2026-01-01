@@ -120,9 +120,18 @@ router.get('/pdf', verifyToken, async (req, res) => {
     
     // Check if file exists
     if (!fs.existsSync(pdfPath)) {
-      console.error(`PDF file not found at path: ${pdfPath}`);
-      return res.status(404).json({ message: 'PDF file not found on server' });
+      console.error(`PDF file not found. Tried paths:`);
+      console.error(`  1. ${path.join(__dirname, '../../api/LanguageSphereBook.pdf')}`);
+      console.error(`  2. ${path.join(__dirname, '../uploads/LanguageSphereBook.pdf')}`);
+      console.error(`  3. ${path.join(__dirname, '../../LanguageSphereBook.pdf')}`);
+      console.error(`  Current __dirname: ${__dirname}`);
+      return res.status(404).json({ 
+        message: 'PDF file not found on server',
+        error: 'Please ensure PDF file is deployed with the application'
+      });
     }
+    
+    console.log(`Serving PDF from: ${pdfPath}`);
 
     // Set headers for PDF viewing (inline means view in browser, not download)
     res.setHeader('Content-Type', 'application/pdf');
