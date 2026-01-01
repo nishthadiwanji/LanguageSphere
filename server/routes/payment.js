@@ -102,29 +102,43 @@ router.get('/pdf', verifyToken, async (req, res) => {
     // Path to PDF file - try multiple locations for different environments
     // For Vercel: PDF is in api/ directory (bundled with serverless function)
     // For local: PDF is in server/uploads/ directory
-    // __dirname will be server/routes/ in the deployment
     
-    // Try api/ directory first (for Vercel deployment)
-    // From server/routes/ go up to root, then to api/
-    let pdfPath = path.join(__dirname, '../../api/LanguageSphereBook.pdf');
+    // Get the root directory (where package.json is)
+    const rootDir = path.resolve(__dirname, '../..');
+    const currentDir = process.cwd();
     
-    // If not found, try local uploads directory (for development)
-    if (!fs.existsSync(pdfPath)) {
-      pdfPath = path.join(__dirname, '../uploads/LanguageSphereBook.pdf');
-    }
+    // Try multiple possible paths
+    const possiblePaths = [
+      // Vercel: api/ directory at project root
+      path.join(rootDir, 'api', 'LanguageSphereBook.pdf'),
+      // Alternative: from current working directory
+      path.join(currentDir, 'api', 'LanguageSphereBook.pdf'),
+      // Local development: server/uploads/
+      path.join(__dirname, '../uploads/LanguageSphereBook.pdf'),
+      // Alternative: api/ relative to server/routes
+      path.join(__dirname, '../../api/LanguageSphereBook.pdf'),
+      // Root directory fallback
+      path.join(rootDir, 'LanguageSphereBook.pdf'),
+    ];
     
-    // If still not found, try root directory as last resort
-    if (!fs.existsSync(pdfPath)) {
-      pdfPath = path.join(__dirname, '../../LanguageSphereBook.pdf');
+    let pdfPath = null;
+    for (const testPath of possiblePaths) {
+      if (fs.existsSync(testPath)) {
+        pdfPath = testPath;
+        console.log(`PDF found at: ${pdfPath}`);
+        break;
+      }
     }
     
     // Check if file exists
-    if (!fs.existsSync(pdfPath)) {
+    if (!pdfPath || !fs.existsSync(pdfPath)) {
       console.error(`PDF file not found. Tried paths:`);
-      console.error(`  1. ${path.join(__dirname, '../../api/LanguageSphereBook.pdf')}`);
-      console.error(`  2. ${path.join(__dirname, '../uploads/LanguageSphereBook.pdf')}`);
-      console.error(`  3. ${path.join(__dirname, '../../LanguageSphereBook.pdf')}`);
-      console.error(`  Current __dirname: ${__dirname}`);
+      possiblePaths.forEach((p, i) => {
+        console.error(`  ${i + 1}. ${p} (exists: ${fs.existsSync(p)})`);
+      });
+      console.error(`  __dirname: ${__dirname}`);
+      console.error(`  process.cwd(): ${process.cwd()}`);
+      console.error(`  rootDir: ${rootDir}`);
       return res.status(404).json({ 
         message: 'PDF file not found on server',
         error: 'Please ensure PDF file is deployed with the application'

@@ -194,21 +194,7 @@ const BookViewerContent: React.FC = () => {
         
         console.log('PDF URL received:', pdfUrlString);
         
-        // Test if the PDF URL is accessible
-        try {
-          const testResponse = await fetch(pdfUrlString, {
-            method: 'HEAD',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-          });
-          if (!testResponse.ok && testResponse.status !== 401 && testResponse.status !== 403) {
-            console.warn('PDF URL test failed with status:', testResponse.status);
-          }
-        } catch (testError) {
-          console.warn('PDF URL accessibility test failed:', testError);
-        }
-        
+        // Set the PDF URL - it will load in the iframe/object tag
         setPdfUrl(pdfUrlString);
         setError(null);
       } catch (err: any) {
