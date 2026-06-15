@@ -618,7 +618,7 @@ const CourseDetails: React.FC = () => {
                         marginBottom: 2,
                       }}
                     >
-                      650 CAD
+                      699 CAD
                     </Typography>
                     <Typography
                       variant="body1"
@@ -1322,7 +1322,7 @@ const CourseDetails: React.FC = () => {
                         marginBottom: 2,
                       }}
                     >
-                      950 CAD
+                      1200 CAD
                     </Typography>
                     <Typography
                       variant="body1"
