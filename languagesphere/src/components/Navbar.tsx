@@ -121,7 +121,7 @@ const Navbar: React.FC = () => {
   const navItems = [
     { label: 'About', href: '#about' },
     { label: 'Services', href: '#services', hasDropdown: true },
-    // { label: 'Course Details & Pricing', href: '/course-details' },
+    { label: 'Course Details & Pricing', href: '/course-details' },
     { label: 'Reviews', href: '#reviews' },
     { label: 'Payments', href: '#payment' },
     { label: 'Contact', href: '#contact' },

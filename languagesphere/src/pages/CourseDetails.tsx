@@ -387,7 +387,7 @@ const CourseDetails: React.FC = () => {
                             marginBottom: 2,
                           }}
                         >
-                          650 CAD
+                          699 CAD
                         </Typography>
                         <Typography
                           variant="body2"
@@ -1420,10 +1420,30 @@ const CourseDetails: React.FC = () => {
                 sx={{
                   fontFamily: "'Poppins', sans-serif",
                   fontSize: '1.1rem',
+                  marginBottom: 1,
+                }}
+              >
+                S-56 Rajouri Garden, Janta Market, Delhi - 110027
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: '1.1rem',
+                  marginBottom: 1,
+                }}
+              >
+                India: +91 81713 18111
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: '1.1rem',
                   marginBottom: 3,
                 }}
               >
-                Contact: +1 613-240-5945
+                Canada: +1 (416) 816-4123
               </Typography>
               <Typography
                 variant="body1"
