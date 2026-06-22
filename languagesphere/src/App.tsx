@@ -10,12 +10,14 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import BookViewer from './pages/BookViewer';
 import ProtectedRoute from './components/ProtectedRoute';
+import WhatsAppFloatButton from './components/WhatsAppFloatButton';
 import './App.css';
 
 function App() {
   return (
     <AuthProvider>
       <Router future={{ v7_startTransition: true }}>
+        <WhatsAppFloatButton />
         <Routes>
           <Route
             path="/"
