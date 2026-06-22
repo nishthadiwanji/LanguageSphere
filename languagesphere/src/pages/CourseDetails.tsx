@@ -24,7 +24,6 @@ import { styled } from '@mui/material/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ScheduleIcon from '@mui/icons-material/Schedule';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import SchoolIcon from '@mui/icons-material/School';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -88,11 +87,8 @@ const IndividualPricingCard = styled(StyledCard)({
 
 const CourseDetails: React.FC = () => {
   const navigate = useNavigate();
-  const a1Ref = useRef<HTMLDivElement>(null);
-  const a2Ref = useRef<HTMLDivElement>(null);
+  const pricingRef = useRef<HTMLDivElement>(null);
   const a1a2Ref = useRef<HTMLDivElement>(null);
-  const b1Ref = useRef<HTMLDivElement>(null);
-  const b2Ref = useRef<HTMLDivElement>(null);
   const b1b2tefRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -114,7 +110,7 @@ const CourseDetails: React.FC = () => {
   };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    const sections = [a1Ref, a2Ref, a1a2Ref, b1Ref, b2Ref, b1b2tefRef];
+    const sections = [pricingRef, pricingRef, a1a2Ref, pricingRef, pricingRef, b1b2tefRef];
     if (sections[newValue]) {
       scrollToSection(sections[newValue]);
     }
@@ -172,7 +168,7 @@ const CourseDetails: React.FC = () => {
           >
             <Tab 
               label="A1" 
-              onClick={() => scrollToSection(a1Ref)}
+              onClick={() => scrollToSection(pricingRef)}
               sx={{
                 background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
                 '&:hover': {
@@ -182,7 +178,7 @@ const CourseDetails: React.FC = () => {
             />
             <Tab 
               label="A2" 
-              onClick={() => scrollToSection(a2Ref)}
+              onClick={() => scrollToSection(pricingRef)}
               sx={{
                 background: 'linear-gradient(135deg, rgba(240, 147, 251, 0.1) 0%, rgba(245, 87, 108, 0.1) 100%)',
                 '&:hover': {
@@ -202,7 +198,7 @@ const CourseDetails: React.FC = () => {
             />
             <Tab 
               label="B1" 
-              onClick={() => scrollToSection(b1Ref)}
+              onClick={() => scrollToSection(pricingRef)}
               sx={{
                 background: 'linear-gradient(135deg, rgba(67, 233, 123, 0.1) 0%, rgba(56, 249, 215, 0.1) 100%)',
                 '&:hover': {
@@ -212,7 +208,7 @@ const CourseDetails: React.FC = () => {
             />
             <Tab 
               label="B2" 
-              onClick={() => scrollToSection(b2Ref)}
+              onClick={() => scrollToSection(pricingRef)}
               sx={{
                 background: 'linear-gradient(135deg, rgba(250, 112, 154, 0.1) 0%, rgba(254, 225, 64, 0.1) 100%)',
                 '&:hover': {
@@ -276,8 +272,8 @@ const CourseDetails: React.FC = () => {
               We are extremely happy and grateful for the trust you've shown in us! 🌟
             </Typography>
 
-            {/* Individual Course Pricing */}
-            <Box sx={{ marginBottom: 8 }}>
+            {/* Package Pricing */}
+            <Box sx={{ marginBottom: 8 }} ref={pricingRef}>
               <Typography
                 variant="h2"
                 sx={{
@@ -288,156 +284,141 @@ const CourseDetails: React.FC = () => {
                   textAlign: 'center',
                 }}
               >
-                Individual Course Pricing
+                Package Pricing
               </Typography>
               <Grid container spacing={4} sx={{ marginBottom: 6 }}>
-                <Grid item xs={12} sm={6} md={3}>
-                  <div ref={a1Ref}>
-                    <IndividualPricingCard>
-                      <CardContent sx={{ padding: 3, textAlign: 'center' }}>
-                        <Typography
-                          variant="h4"
-                          sx={{
-                            fontFamily: "'Poppins', sans-serif",
-                            fontWeight: 600,
-                            marginBottom: 2,
-                          }}
-                        >
-                          A1 Level
-                        </Typography>
-                        <Typography
-                          variant="h3"
-                          sx={{
-                            fontFamily: "'Poppins', sans-serif",
-                            fontWeight: 600,
-                            marginBottom: 2,
-                          }}
-                        >
-                          450 CAD
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontFamily: "'Poppins', sans-serif",
-                            opacity: 0.9,
-                          }}
-                        >
-                          Foundation Building Course
-                        </Typography>
-                      </CardContent>
-                    </IndividualPricingCard>
-                  </div>
+                <Grid item xs={12} md={6}>
+                  <IndividualPricingCard>
+                    <CardContent sx={{ padding: 3, textAlign: 'center' }}>
+                      <Typography
+                        variant="h4"
+                        sx={{
+                          fontFamily: "'Poppins', sans-serif",
+                          fontWeight: 600,
+                          marginBottom: 2,
+                        }}
+                      >
+                        Three-Month Package
+                      </Typography>
+                      <Typography
+                        variant="h3"
+                        sx={{
+                          fontFamily: "'Poppins', sans-serif",
+                          fontWeight: 600,
+                          marginBottom: 2,
+                        }}
+                      >
+                        $699
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontFamily: "'Poppins', sans-serif",
+                          marginBottom: 1,
+                          opacity: 0.9,
+                        }}
+                      >
+                        Instalment Plan: 
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontFamily: "'Poppins', sans-serif",
+                          marginBottom: 1,
+                          opacity: 0.9,
+                        }}
+                      >
+                        1st Instalment: $399 
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontFamily: "'Poppins', sans-serif",
+                          marginBottom: 1,
+                          opacity: 0.9,
+                        }}
+                      >
+                        2nd Instalment: $300 (40 days later)
+                      </Typography>
+                    </CardContent>
+                  </IndividualPricingCard>
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                  <div ref={a2Ref}>
-                    <IndividualPricingCard>
-                      <CardContent sx={{ padding: 3, textAlign: 'center' }}>
-                        <Typography
-                          variant="h4"
-                          sx={{
-                            fontFamily: "'Poppins', sans-serif",
-                            fontWeight: 600,
-                            marginBottom: 2,
-                          }}
-                        >
-                          A2 Level
-                        </Typography>
-                        <Typography
-                          variant="h3"
-                          sx={{
-                            fontFamily: "'Poppins', sans-serif",
-                            fontWeight: 600,
-                            marginBottom: 2,
-                          }}
-                        >
-                          450 CAD
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontFamily: "'Poppins', sans-serif",
-                            opacity: 0.9,
-                          }}
-                        >
-                          Fluency & Expression Course
-                        </Typography>
-                      </CardContent>
-                    </IndividualPricingCard>
-                  </div>
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                  <div ref={b1Ref}>
-                    <IndividualPricingCard>
-                      <CardContent sx={{ padding: 3, textAlign: 'center' }}>
-                        <Typography
-                          variant="h4"
-                          sx={{
-                            fontFamily: "'Poppins', sans-serif",
-                            fontWeight: 600,
-                            marginBottom: 2,
-                          }}
-                        >
-                          B1 Level
-                        </Typography>
-                        <Typography
-                          variant="h3"
-                          sx={{
-                            fontFamily: "'Poppins', sans-serif",
-                            fontWeight: 600,
-                            marginBottom: 2,
-                          }}
-                        >
-                          699 CAD
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontFamily: "'Poppins', sans-serif",
-                            opacity: 0.9,
-                          }}
-                        >
-                          Intermediate Course
-                        </Typography>
-                      </CardContent>
-                    </IndividualPricingCard>
-                  </div>
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                  <div ref={b2Ref}>
-                    <IndividualPricingCard>
-                      <CardContent sx={{ padding: 3, textAlign: 'center' }}>
-                        <Typography
-                          variant="h4"
-                          sx={{
-                            fontFamily: "'Poppins', sans-serif",
-                            fontWeight: 600,
-                            marginBottom: 2,
-                          }}
-                        >
-                          B2 Level
-                        </Typography>
-                        <Typography
-                          variant="h3"
-                          sx={{
-                            fontFamily: "'Poppins', sans-serif",
-                            fontWeight: 600,
-                            marginBottom: 2,
-                          }}
-                        >
-                          750 CAD
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontFamily: "'Poppins', sans-serif",
-                            opacity: 0.9,
-                          }}
-                        >
-                          Advanced Course
-                        </Typography>
-                      </CardContent>
-                    </IndividualPricingCard>
-                  </div>
+                <Grid item xs={12} md={6}>
+                  <IndividualPricingCard>
+                    <CardContent sx={{ padding: 3, textAlign: 'center' }}>
+                      <Typography
+                        variant="h4"
+                        sx={{
+                          fontFamily: "'Poppins', sans-serif",
+                          fontWeight: 600,
+                          marginBottom: 2,
+                        }}
+                      >
+                        Seven-Month Package
+                      </Typography>
+                      <Typography
+                        variant="h5"
+                        sx={{
+                          fontFamily: "'Poppins', sans-serif",
+                          fontWeight: 500,
+                          marginBottom: 1,
+                          opacity: 0.85,
+                          textDecoration: 'line-through',
+                        }}
+                      >
+                        $1,500
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontFamily: "'Poppins', sans-serif",
+                          marginBottom: 1,
+                          opacity: 0.9,
+                        }}
+                      >
+                        $250 Discount
+                      </Typography>
+                      <Typography
+                        variant="h3"
+                        sx={{
+                          fontFamily: "'Poppins', sans-serif",
+                          fontWeight: 600,
+                        }}
+                      >
+                        $1,250
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontFamily: "'Poppins', sans-serif",
+                          marginBottom: 1,
+                          opacity: 0.9,
+                        }}
+                      >
+                        Instalment Plan: 
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontFamily: "'Poppins', sans-serif",
+                          marginBottom: 1,
+                          opacity: 0.9,
+                        }}
+                      >
+                        1st Instalment: $625 
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontFamily: "'Poppins', sans-serif",
+                          marginBottom: 1,
+                          opacity: 0.9,
+                        }}
+                      >
+                        2nd Instalment: $625 (40 days later)
+                      </Typography>
+                    </CardContent>
+                  </IndividualPricingCard>
                 </Grid>
               </Grid>
             </Box>
@@ -531,9 +512,9 @@ const CourseDetails: React.FC = () => {
               </CourseCard>
             </Box>
 
-            {/* Schedule & Pricing */}
+            {/* Schedule & Duration */}
             <Grid container spacing={4} sx={{ marginBottom: 8 }}>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={8} sx={{ mx: 'auto' }}>
                 <PricingCard>
                   <CardContent sx={{ padding: 4 }}>
                     <Stack direction="row" spacing={2} alignItems="center" sx={{ marginBottom: 3 }}>
@@ -583,74 +564,6 @@ const CourseDetails: React.FC = () => {
                         </ListItemIcon>
                         <ListItemText
                           primary="Course Duration: 3 months"
-                          sx={{
-                            '& .MuiListItemText-primary': {
-                              fontFamily: "'Poppins', sans-serif",
-                              fontSize: '1.1rem',
-                            },
-                          }}
-                        />
-                      </ListItem>
-                    </List>
-                  </CardContent>
-                </PricingCard>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <PricingCard>
-                  <CardContent sx={{ padding: 4 }}>
-                    <Stack direction="row" spacing={2} alignItems="center" sx={{ marginBottom: 3 }}>
-                      <AttachMoneyIcon sx={{ fontSize: 40 }} />
-                      <Typography
-                        variant="h4"
-                        sx={{
-                          fontFamily: "'Poppins', sans-serif",
-                          fontWeight: 600,
-                        }}
-                      >
-                        Course Fee
-                      </Typography>
-                    </Stack>
-                    <Typography
-                      variant="h3"
-                      sx={{
-                        fontFamily: "'Poppins', sans-serif",
-                        fontWeight: 600,
-                        marginBottom: 2,
-                      }}
-                    >
-                      699 CAD
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontFamily: "'Poppins', sans-serif",
-                        fontSize: '1.1rem',
-                        marginBottom: 2,
-                      }}
-                    >
-                      Payment Plan:
-                    </Typography>
-                    <List>
-                      <ListItem sx={{ paddingLeft: 0 }}>
-                        <ListItemIcon>
-                          <CheckCircleIcon sx={{ color: '#fff' }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary="1st Installment (60%): 390 CAD"
-                          sx={{
-                            '& .MuiListItemText-primary': {
-                              fontFamily: "'Poppins', sans-serif",
-                              fontSize: '1.1rem',
-                            },
-                          }}
-                        />
-                      </ListItem>
-                      <ListItem sx={{ paddingLeft: 0 }}>
-                        <ListItemIcon>
-                          <CheckCircleIcon sx={{ color: '#fff' }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary="2nd Installment (40%): 260 CAD"
                           sx={{
                             '& .MuiListItemText-primary': {
                               fontFamily: "'Poppins', sans-serif",
@@ -881,7 +794,7 @@ const CourseDetails: React.FC = () => {
                         fontWeight: 600,
                       }}
                     >
-                      B1 + B2 + TEF/TCF Preparation
+                      A1 to B2 + TEF/TCF Preparation
                     </Typography>
                   </Stack>
                   <Typography
@@ -893,8 +806,8 @@ const CourseDetails: React.FC = () => {
                       marginBottom: 3,
                     }}
                   >
-                    After completing A1 and A2, learners can join our small, personalized batches designed for advanced learners.
-                    These batches focus on fluency, grammar mastery, and comprehensive exam strategies to ensure success in TEF and TCF examinations.
+                    Learners can join our batches designed for beginners from A1 to B2 level along with TEF/TCF Preparation.
+                    Along with A1 to B2 syllabus, these batches focus on fluency, grammar mastery, and comprehensive exam strategies to ensure success in TEF and TCF examinations.
                   </Typography>
                   <Typography
                     variant="h5"
@@ -908,7 +821,7 @@ const CourseDetails: React.FC = () => {
                   </Typography>
                   <Grid container spacing={2}>
                     {[
-                      'B1 + B2 + Exam-Level Preparation',
+                      'A1 to B2 + Exam-Level Preparation',
                       'Advanced Vocabulary Expansion',
                       'Repeated Exam Practice',
                       'Strategic Writing & Speaking Techniques',
@@ -1210,9 +1123,9 @@ const CourseDetails: React.FC = () => {
               </Grid>
             </Grid>
 
-            {/* B1+B2 Schedule & Pricing */}
+            {/* B1+B2 Schedule & Duration */}
             <Grid container spacing={4} sx={{ marginBottom: 8 }}>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={8} sx={{ mx: 'auto' }}>
                 <PricingCard>
                   <CardContent sx={{ padding: 4 }}>
                     <Stack direction="row" spacing={2} alignItems="center" sx={{ marginBottom: 3 }}>
@@ -1261,7 +1174,7 @@ const CourseDetails: React.FC = () => {
                           <CheckCircleIcon sx={{ color: '#fff' }} />
                         </ListItemIcon>
                         <ListItemText
-                          primary="Minimum Duration: 3 months"
+                          primary="Minimum Duration: 7 months"
                           sx={{
                             '& .MuiListItemText-primary': {
                               fontFamily: "'Poppins', sans-serif",
@@ -1285,96 +1198,6 @@ const CourseDetails: React.FC = () => {
                         />
                       </ListItem>
                     </List>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontFamily: "'Poppins', sans-serif",
-                        fontSize: '1rem',
-                        marginTop: 2,
-                        opacity: 0.9,
-                      }}
-                    >
-                      
-                    </Typography>
-                  </CardContent>
-                </PricingCard>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <PricingCard>
-                  <CardContent sx={{ padding: 4 }}>
-                    <Stack direction="row" spacing={2} alignItems="center" sx={{ marginBottom: 3 }}>
-                      <AttachMoneyIcon sx={{ fontSize: 40 }} />
-                      <Typography
-                        variant="h4"
-                        sx={{
-                          fontFamily: "'Poppins', sans-serif",
-                          fontWeight: 600,
-                        }}
-                      >
-                        Course Fee
-                      </Typography>
-                    </Stack>
-                    <Typography
-                      variant="h3"
-                      sx={{
-                        fontFamily: "'Poppins', sans-serif",
-                        fontWeight: 600,
-                        marginBottom: 2,
-                      }}
-                    >
-                      1200 CAD
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontFamily: "'Poppins', sans-serif",
-                        fontSize: '1.1rem',
-                        marginBottom: 2,
-                      }}
-                    >
-                      Payment Plan:
-                    </Typography>
-                    <List>
-                      <ListItem sx={{ paddingLeft: 0 }}>
-                        <ListItemIcon>
-                          <CheckCircleIcon sx={{ color: '#fff' }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary="1st Installment (60%): 570 CAD"
-                          sx={{
-                            '& .MuiListItemText-primary': {
-                              fontFamily: "'Poppins', sans-serif",
-                              fontSize: '1.1rem',
-                            },
-                          }}
-                        />
-                      </ListItem>
-                      <ListItem sx={{ paddingLeft: 0 }}>
-                        <ListItemIcon>
-                          <CheckCircleIcon sx={{ color: '#fff' }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary="2st Installment (40%): 380 CAD"
-                          sx={{
-                            '& .MuiListItemText-primary': {
-                              fontFamily: "'Poppins', sans-serif",
-                              fontSize: '1.1rem',
-                            },
-                          }}
-                        />
-                      </ListItem>
-                    </List>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontFamily: "'Poppins', sans-serif",
-                        fontSize: '1rem',
-                        marginTop: 2,
-                        opacity: 0.9,
-                      }}
-                    >
-                      Minimum Duration: 3 Months
-                    </Typography>
                   </CardContent>
                 </PricingCard>
               </Grid>
@@ -1420,10 +1243,52 @@ const CourseDetails: React.FC = () => {
                 sx={{
                   fontFamily: "'Poppins', sans-serif",
                   fontSize: '1.1rem',
-                  marginBottom: 1,
+                  fontWeight: 600,
+                  marginBottom: 0.5,
                 }}
               >
-                S-56 Rajouri Garden, Janta Market, Delhi - 110027
+                Canada Office
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: '1.1rem',
+                  marginBottom: 2,
+                }}
+              >
+                545 Sherbourne St,
+                <br />
+                Toronto, ON M4X 1W5,
+                <br />
+                Canada
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: '1.1rem',
+                  fontWeight: 600,
+                  marginBottom: 0.5,
+                }}
+              >
+                India Office
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: '1.1rem',
+                  marginBottom: 2,
+                }}
+              >
+                S-56, Janta Market,
+                <br />
+                Rajouri Garden,
+                <br />
+                Delhi – 110027,
+                <br />
+                India
               </Typography>
               <Typography
                 variant="body1"
