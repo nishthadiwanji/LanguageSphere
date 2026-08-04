@@ -38,36 +38,6 @@ const Footer: React.FC = () => {
               fontWeight: 600,
             }}
           >
-            Canada Office
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              fontFamily: "'Poppins', sans-serif",
-              textAlign: 'center',
-              display: 'inline-flex',
-              alignItems: 'flex-start',
-              gap: 0.5,
-            }}
-          >
-            <LocationOnIcon sx={{ fontSize: '1.1rem', mt: 0.3 }} />
-            <span>
-              545 Sherbourne St,
-              <br />
-              Toronto, ON M4X 1W5,
-              <br />
-              Canada
-            </span>
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              fontFamily: "'Poppins', sans-serif",
-              textAlign: 'center',
-              fontWeight: 600,
-              pt: 1,
-            }}
-          >
             India Office
           </Typography>
           <Typography
