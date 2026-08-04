@@ -1247,31 +1247,7 @@ const CourseDetails: React.FC = () => {
                   marginBottom: 0.5,
                 }}
               >
-                Canada Office
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{
-                  fontFamily: "'Poppins', sans-serif",
-                  fontSize: '1.1rem',
-                  marginBottom: 2,
-                }}
-              >
-                545 Sherbourne St,
-                <br />
-                Toronto, ON M4X 1W5,
-                <br />
-                Canada
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{
-                  fontFamily: "'Poppins', sans-serif",
-                  fontSize: '1.1rem',
-                  fontWeight: 600,
-                  marginBottom: 0.5,
-                }}
-              >
+                
                 India Office
               </Typography>
               <Typography
